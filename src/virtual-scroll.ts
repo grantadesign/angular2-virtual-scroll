@@ -276,6 +276,11 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     start = Math.max(0, start);
     end += this.bufferAmount;
     end = Math.min(items.length, end);
+
+    if (end === -1) {
+        end = 0;
+    }
+    
     if (start !== this.previousStart || end !== this.previousEnd) {
 
       // update the scroll list
