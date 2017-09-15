@@ -80,7 +80,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
 
   private refreshHandler = () => {
       this.refresh();
-  };
+  }
 
   private _parentScroll: Element | Window;
 
@@ -159,7 +159,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
       this.previousStart = undefined;
       this.previousEnd = undefined;
       const items = (changes as any).items || {};
-      if ((changes as any).items != undefined && items.previousValue == undefined || (items.previousValue != undefined && items.previousValue.length === 0)) {
+      if ((changes as any).items != null && items.previousValue == null || (items.previousValue != null && items.previousValue.length === 0)) {
           this.startupLoop = true;
       }
       this.refresh();
@@ -173,8 +173,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
 
   public scrollInto(item: any) {
       const el: Element = this.parentScroll instanceof Window ? document.body : this.parentScroll || this.element.nativeElement;
-      const offsetTop = this.getElementsOffset();
-      const index: number = (this.items || []).indexOf(item);
+      const index = (this.items || []).indexOf(item);
 
       if (index < 0 || index >= (this.items || []).length) { return; }
 
@@ -202,11 +201,13 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private countItemsPerRow() {
-      let offsetTop;
-      let itemsPerRow;
-      let children = this.contentElementRef.nativeElement.children;
+      let offsetTop: number;
+      let itemsPerRow: number;
+      const children = this.contentElementRef.nativeElement.children;
       for (itemsPerRow = 0; itemsPerRow < children.length; itemsPerRow++) {
-          if (offsetTop != undefined && offsetTop !== children[itemsPerRow].offsetTop) break;
+          if (offsetTop != null && offsetTop !== children[itemsPerRow].offsetTop) {
+              break;
+          }
           offsetTop = children[itemsPerRow].offsetTop;
       }
       return itemsPerRow;
@@ -233,8 +234,8 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
       const viewWidth = el.clientWidth - this.scrollbarWidth;
       const viewHeight = el.clientHeight - this.scrollbarHeight;
 
-      let contentDimensions;
-      if (this.childWidth == undefined || this.childHeight == undefined) {
+      let contentDimensions: { width: number, height: number };
+      if (this.childWidth == null || this.childHeight == null) {
           let content = this.contentElementRef.nativeElement as HTMLElement;
           if (this.containerElementRef && this.containerElementRef.nativeElement) {
               content = this.containerElementRef.nativeElement;
@@ -244,18 +245,20 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
               height: viewHeight
           };
       }
-      let childWidth = this.childWidth || contentDimensions.width;
-      let childHeight = this.childHeight || contentDimensions.height;
+      const childWidth = this.childWidth || contentDimensions.width;
+      const childHeight = this.childHeight || contentDimensions.height;
 
       let itemsPerRow = Math.max(1, this.countItemsPerRow());
 
-      let itemsPerRowByCalc = Math.max(1, Math.floor(viewWidth / childWidth));
+      const itemsPerRowByCalc = Math.max(1, Math.floor(viewWidth / childWidth));
+      const itemsPerCol = Math.max(1, Math.floor(viewHeight / childHeight));
 
-      let itemsPerCol = Math.max(1, Math.floor(viewHeight / childHeight));
-      let elScrollTop = this.parentScroll instanceof Window
+      const elScrollTop = this.parentScroll instanceof Window
           ? (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0)
           : el.scrollTop;
-      let scrollTop = Math.max(0, elScrollTop);
+
+      const scrollTop = Math.max(0, elScrollTop);
+
       if (itemsPerCol === 1 && Math.floor(scrollTop / this.scrollHeight * itemCount) + itemsPerRowByCalc >= itemCount) {
           itemsPerRow = itemsPerRowByCalc;
       }
